@@ -203,6 +203,16 @@ public class KnowledgeGraph extends OrientedGraph<KnowledgeNode> {
 		clearMemory();
 		return isALoopGeneratedRec (node);
 	}
+	
+	/*
+	 * 
+	 * 
+	 * 
+	 */
+	
+	public KnowledgeNode getANode (String nodeName) {
+		return getNodes().get(nodeExists(nodeName));
+	}
 
 	/*
 	 * 

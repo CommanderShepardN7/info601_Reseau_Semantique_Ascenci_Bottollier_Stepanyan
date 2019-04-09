@@ -76,15 +76,15 @@ public class MainConsole extends ActionConsole {
 		g.addNode(d);
 		g.addNode(e);
 		
-		g.getNodes().get(g.nodeExists("a")).addIsARelation(g.getNodes().get(g.nodeExists("b")));
-		g.getNodes().get(g.nodeExists("b")).addIsARelation(g.getNodes().get(g.nodeExists("d")));
-		g.getNodes().get(g.nodeExists("d")).addIsARelation(g.getNodes().get(g.nodeExists("e")));
+		g.getANode("a").addIsARelation(g.getANode("b"));
+		g.getANode("b").addIsARelation(g.getANode("d"));
+		g.getANode("d").addIsARelation(g.getANode("e"));
 		
 		ecrire_console(g.isALoopGenerated(g.getNodes().get(g.nodeExists("a"))));
 		
-		g.getNodes().get(g.nodeExists("e")).addIsARelation(g.getNodes().get(g.nodeExists("a")));
+		g.getANode("e").addIsARelation(g.getANode("e"));
 		
-		ecrire_console(g.isALoopGenerated(g.getNodes().get(g.nodeExists("a")))); // on remarque que la vérification de boucle fonctionne!!!
+		ecrire_console(g.isALoopGenerated(g.getANode("a"))); // on remarque que la vérification de boucle fonctionne!!!
 		
 		///////////////////////////////////////////
 
