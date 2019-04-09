@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import constantes.Constantes;
+import types.TRelation;
 
 /**********************************************************
  * 
@@ -245,6 +246,25 @@ public class KnowledgeNode extends OrientedNode {
 	
 	public boolean hasIsQuadCoreOfRelation() {
 		return getIsQuadCoreOfRelation().size()>0;
+	}
+	
+	/*
+	 * 
+	 * 
+	 * 
+	 */
+	
+	public boolean hasRelation(TRelation relation) {
+		switch(relation) {
+		case IS_A:
+			return hasIsARelation();
+		case IS_MODEL_OF:
+			return hasIsModelOfRelation();
+		case IS_QUAD_CORE_OF:
+			return hasIsQuadCoreOfRelation();
+		default:
+			return false;
+		}
 	}
 	
 }

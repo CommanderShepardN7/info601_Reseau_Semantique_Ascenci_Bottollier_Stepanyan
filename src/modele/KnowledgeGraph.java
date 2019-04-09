@@ -3,6 +3,7 @@ package modele;
 import java.util.ArrayList;
 
 import constantes.Constantes;
+import types.TRelation;
 
 /**********************************************************
  * 
@@ -37,8 +38,12 @@ public class KnowledgeGraph extends OrientedGraph<KnowledgeNode> {
 	 *********************************************************/
 
 	public KnowledgeGraph(String graphName) {
+		this(graphName, new ArrayList<KnowledgeNode>());
+	}
+	
+	public KnowledgeGraph(String graphName, ArrayList<KnowledgeNode> nodes) {
 		setName(graphName);
-		setNodes(new ArrayList<KnowledgeNode>());
+		setNodes(nodes);
 	}
 	
 	/**********************************************************
@@ -90,6 +95,33 @@ public class KnowledgeGraph extends OrientedGraph<KnowledgeNode> {
 				i++;
 			}
 			return loop;
+		}
+	}
+	
+	protected KnowledgeNode firstNodeWithRelationRec (KnowledgeNode node, TRelation relation) {
+		
+		// si le noeud actuel a la relation donnée
+		if (node.hasRelation(relation)) {
+			return node;
+		}
+		
+		else {
+			addMemory(node);
+			
+			KnowledgeNode hasRelation = (KnowledgeNode) Constantes.NOT_SET_OBJECT;
+			
+			// on parcourt toutes les relations
+			ArrayList<KnowledgeNode> nodesToVisit = new ArrayList<KnowledgeNode>();
+			nodesToVisit.addAll(node.getIsARelation());
+			nodesToVisit.addAll(node.getIsModelOfRelation());
+			nodesToVisit.addAll(node.getIsQuadCoreOfRelation());
+			
+			int i = 0;
+			while (i<nodesToVisit.size() && hasRelation.equals(Constantes.NOT_SET_OBJECT)) {
+				//hasRelation = firstNodeWithRelationRec (node.get)
+			}
+			
+			return hasRelation;
 		}
 	}
 	
@@ -163,6 +195,23 @@ public class KnowledgeGraph extends OrientedGraph<KnowledgeNode> {
 	 * 
 	 * 
 	 */
+	
+	public boolean addIsARelation(String nodeName, String nodeRelatedName) {
+		 boolean isAdded = getANode(nodeName).addIsARelation(getANode(nodeRelatedName));
+		
+		/* si une boucle est générée, on supprime la relation */
+		if (isALoopGenerated(nodeName)) {
+			getANode(nodeName).removeIsARelation(getANode(nodeRelatedName));
+			isAdded = false;
+		}
+		return isAdded;
+	}
+	
+	/*
+	 * 
+	 * 
+	 * 
+	 */
 
 	@Override
 	public int nbNodes () {
@@ -199,8 +248,9 @@ public class KnowledgeGraph extends OrientedGraph<KnowledgeNode> {
 	 * 
 	 */
 	
-	public boolean isALoopGenerated (KnowledgeNode node) {
+	public boolean isALoopGenerated (String nodeName) {
 		clearMemory();
+		KnowledgeNode node = getANode(nodeName);
 		return isALoopGeneratedRec (node);
 	}
 	
@@ -212,6 +262,18 @@ public class KnowledgeGraph extends OrientedGraph<KnowledgeNode> {
 	
 	public KnowledgeNode getANode (String nodeName) {
 		return getNodes().get(nodeExists(nodeName));
+	}
+	
+	/*
+	 * 
+	 * 
+	 * 
+	 */
+	
+	public KnowledgeNode firstNodeWithRelation (String firstNodeName, TRelation relation) {
+		clearMemory();
+		KnowledgeNode node = getANode(firstNodeName);
+		return firstNodeWithRelationRec (node, relation);
 	}
 
 	/*

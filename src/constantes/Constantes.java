@@ -14,8 +14,15 @@ public class Constantes {
 	
 	/**********************************************************
 	 * 
+	 * KnowledgeGraph
+	 * 
+	 *********************************************************/
+	
+	public static final Object NOT_SET_OBJECT = null;
+	
+	/**********************************************************
+	 * 
 	 * KnowledgeNode
-	 * Date releaseDate, String socket, String ram, int price
 	 * 
 	 *********************************************************/
 	

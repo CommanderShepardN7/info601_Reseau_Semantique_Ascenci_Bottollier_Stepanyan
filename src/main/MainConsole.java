@@ -76,15 +76,21 @@ public class MainConsole extends ActionConsole {
 		g.addNode(d);
 		g.addNode(e);
 		
-		g.getANode("a").addIsARelation(g.getANode("b"));
-		g.getANode("b").addIsARelation(g.getANode("d"));
-		g.getANode("d").addIsARelation(g.getANode("e"));
+//		g.getANode("a").addIsARelation(g.getANode("b"));
+//		g.getANode("b").addIsARelation(g.getANode("d"));
+//		g.getANode("d").addIsARelation(g.getANode("e"));
 		
-		ecrire_console(g.isALoopGenerated(g.getNodes().get(g.nodeExists("a"))));
+		g.addIsARelation("a", "b");
+		g.addIsARelation("b", "d");
+		g.addIsARelation("d", "e");
 		
-		g.getANode("e").addIsARelation(g.getANode("e"));
+		ecrire_console(g.isALoopGenerated("a"));
 		
-		ecrire_console(g.isALoopGenerated(g.getANode("a"))); // on remarque que la vérification de boucle fonctionne!!!
+//		g.getANode("e").addIsARelation(g.getANode("e"));
+		
+		g.addIsARelation("e", "e");
+		
+		ecrire_console(g.isALoopGenerated("a")); // on remarque que la vérification de boucle fonctionne!!!
 		
 		///////////////////////////////////////////
 
@@ -245,8 +251,8 @@ public class MainConsole extends ActionConsole {
 		
 		int choix = recupere_int();
 		
-		while(!(choix >= 1 && choix <= 5)) {
-			ecrire_console("La commande saisie doit etre comprise entre 1 et 5.");
+		while(!(choix >= 1 && choix <= 8)) {
+			ecrire_console("La commande saisie doit etre comprise entre 1 et 8.");
 			choix = recupere_int();
 		}
 		
