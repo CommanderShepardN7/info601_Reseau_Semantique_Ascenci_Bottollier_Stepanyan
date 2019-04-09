@@ -27,7 +27,7 @@ public class ActionConsole {
 	 * 
 	 *********************************************************/
 	
-	protected static void ecrire_console(String s) {
+	protected static void ecrire_console(Object s) {
 		System.out.println(s);
 	}
 	

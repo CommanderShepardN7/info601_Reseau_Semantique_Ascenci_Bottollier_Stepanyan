@@ -1,8 +1,12 @@
 package main;
 
-import constantes.ConstantesBasiques;
+import java.util.Date;
+
+import constantes.Constantes;
 import lisibilite_code.ActionConsole;
-import modele.Graphe;
+import modele.KnowledgeGraph;
+import modele.KnowledgeNode;
+
 
 /**********************************************************
  * 
@@ -10,29 +14,6 @@ import modele.Graphe;
  * 
  * Interface sur console.
  * L'utilisateur peut manipuler un graphe orienté.
- * 
- * Démonstration lemme de König.
- * Pour un chemin donné, retourne un chemin élémentaire.
- * 
- * IDEE: 
- * Sauvegarde des graphes créés dans fichiers.
- * Un fichier par graphe + un fichier json sauvegardant
- * le nom de chaque graphe.
- * Le nom d'un graphe est unique.
- * On peut récupérer un graphe sauvegardé.
- * 
- * IDEE:
- * Différencier graphe orienté/non orienté.
- * => configGraphe s'en occupe.
- * 
- * IDEE:
- * Pouvoir créer plusieurs noeuds à la fois.
- * 
- * IDEE:
- * Créer des classes Exceptions pour optimiser code.
- * 
- * IDEE:
- * Interface graphique (à faire en dernier lieu)
  * 
  *********************************************************/
 
@@ -42,10 +23,12 @@ public class MainConsole extends ActionConsole {
 	 * 
 	 * Attributs de MainConsole:
 	 * - un graphe
+	 * - un booléen pour permettre à l'utilisateur de sortir du programme
 	 * 
 	 *********************************************************/
 	
-	private static Graphe g;
+	private static KnowledgeGraph g;
+	private static boolean isInProgress;
 	
 	/**********************************************************
 	 * 
@@ -55,18 +38,56 @@ public class MainConsole extends ActionConsole {
 	
 	/*
 	 * 
+	 * 
+	 * 
+	 */
+	
+	private static void progConfig() {
+		isInProgress = true;
+	}
+	
+	/*
+	 * 
 	 * Configuration du graphe.
 	 * 
 	 * Demande à l'utilisateur le nom du graphe.
 	 * 
 	 */
 	
-	private static void configGraphe() {
-		ecrire_console(ConstantesBasiques.CONSOLE_SEPARATOR);
+	private static void graphConfig() {
+		ecrire_console(Constantes.CONSOLE_SEPARATOR);
 		ecrire_console("Nom du graphe: ");
 		
-		/* à modifier pour choix entre graphe orienté/non orienté */
-		g = new Graphe(recupere_string());
+		g = new KnowledgeGraph(recupere_string());
+		
+		///////////////////////////////////////////
+		
+		/* Tests */
+		
+		KnowledgeNode a = new KnowledgeNode("a");
+		KnowledgeNode b = new KnowledgeNode("b");
+		KnowledgeNode c = new KnowledgeNode("c");
+		KnowledgeNode d = new KnowledgeNode("d");
+		KnowledgeNode e = new KnowledgeNode("e");
+		
+		g.addNode(a);
+		g.addNode(b);
+		g.addNode(c);
+		g.addNode(d);
+		g.addNode(e);
+		
+		g.getNodes().get(g.nodeExists("a")).addIsARelation(g.getNodes().get(g.nodeExists("b")));
+		g.getNodes().get(g.nodeExists("b")).addIsARelation(g.getNodes().get(g.nodeExists("d")));
+		g.getNodes().get(g.nodeExists("d")).addIsARelation(g.getNodes().get(g.nodeExists("e")));
+		
+		ecrire_console(g.isALoopGenerated(g.getNodes().get(g.nodeExists("a"))));
+		
+		g.getNodes().get(g.nodeExists("e")).addIsARelation(g.getNodes().get(g.nodeExists("a")));
+		
+		ecrire_console(g.isALoopGenerated(g.getNodes().get(g.nodeExists("a")))); // on remarque que la vérification de boucle fonctionne!!!
+		
+		///////////////////////////////////////////
+
 	}
 	
 	/*
@@ -75,7 +96,7 @@ public class MainConsole extends ActionConsole {
 	 * 
 	 */
 	
-	private static void displayStateGraphe() {
+	private static void displayGraphState() {
 		ecrire_console(g.toString());
 	}
 	
@@ -89,10 +110,13 @@ public class MainConsole extends ActionConsole {
 		ecrire_console("Commandes:");
 		ecrire_console("1 - Creer un nouveau noeud");
 		ecrire_console("2 - Supprimer un noeud");
-		ecrire_console("3 - Creer un lien entre deux noeuds");
-		ecrire_console("4 - Supprimer un lien existant entre deux noeuds");
-		ecrire_console("5 - Verifier si un chemin existe entre deux noeuds");
-		ecrire_console(ConstantesBasiques.CONSOLE_SEPARATOR);
+		ecrire_console("3 - Configurer un noeud existant");
+		ecrire_console("4 - Creer un lien entre deux noeuds");
+		ecrire_console("5 - Supprimer un lien existant entre deux noeuds");
+		ecrire_console("6 - Verifier si un noeud a une relation donnee, sinon recherche si elle est accessible a partir de ce noeud");
+		ecrire_console("7 - Verifier si un noeud a un attribut donne, sinon recherche parmi ses \"parents\" l'attribut donne");
+		ecrire_console("8 - Quitter le programme");
+		ecrire_console(Constantes.CONSOLE_SEPARATOR);
 	}
 	
 	/*
@@ -102,11 +126,13 @@ public class MainConsole extends ActionConsole {
 	 * 
 	 */
 	
-	private static void handleNewNoeud() {
+	private static void handleNewNode() {
 		ecrire_console("Nom du nouveau noeud:");
-		while(!g.newNoeud(recupere_string())) {
+		
+		while(!g.addNode(new KnowledgeNode(recupere_string()))) {
 			ecrire_console("Ce nom a deja ete attribue.");
 		}
+		
 		ecrire_console("Le noeud a bien ete cree.");
 	}
 	
@@ -117,12 +143,12 @@ public class MainConsole extends ActionConsole {
 	 * 
 	 */
 	
-	private static void handleRemoveNoeud() {
-		if(g.nbNoeuds() > 0) {
+	private static void handleRemoveNode() {
+		if(g.nbNodes() > 0) {
 			ecrire_console("Nom du noeud a supprimer:");
 			
 			/* on autorise l'utilisateur a revenir en arriere en cas d'erreur */
-			if(g.removeNoeud(recupere_string())) {
+			if(g.removeNode(recupere_string())) {
 				ecrire_console("Le noeud a bien ete supprime.");
 			}
 			else {
@@ -136,32 +162,31 @@ public class MainConsole extends ActionConsole {
 	
 	/*
 	 * 
+	 * Demande à l'utilisateur ce qu'il souhaite modifier sur un noeud donné.
+	 * 
+	 * 
+	 */
+	
+	private static void handleConfigureNode() {
+		if(g.nbNodes() > 0) {
+			ecrire_console("Nom du noeud a modifier:");
+			
+			
+		}
+		else {
+			ecrire_console("Aucun noeud n'a encore ete cree.");
+		}
+	}
+	
+	/*
+	 * 
 	 * Traite le cas où l'utilisateur souhaite
 	 * créer un lien entre deux noeuds existants.
 	 * 
 	 */
 	
-	private static void handleNewLien() {
-		if(g.nbNoeuds() > 0) {
-			ecrire_console("Nom du premier noeud:");
-			String vois1 = recupere_string();
-			ecrire_console("Nom du deuxieme noeud:");
-			String vois2 = recupere_string();
-			
-			while(!g.newLien(vois1, vois2)) {
-				ecrire_console("Au moins un des deux noeuds n'existe pas.");
-				
-				ecrire_console("Nom du premier noeud:");
-				vois1 = recupere_string();
-				ecrire_console("Nom du deuxieme noeud:");
-				vois2 = recupere_string();
-			}
-			ecrire_console("Le lien a bien ete cree entre " + vois1 + " et " + vois2 + ".");
-			
-		}
-		else {
-			ecrire_console("Il n'y a pas assez de noeuds crees.");
-		}
+	private static void handleNewRelation() {
+		
 	}
 	
 	/*
@@ -172,26 +197,18 @@ public class MainConsole extends ActionConsole {
 	 * 
 	 */
 	
-	private static void handleRemoveLien() {
-		if(g.lienExiste()) {
-			ecrire_console("Nom du premier noeud:");
-			String vois1 = recupere_string();
-			ecrire_console("Nom du deuxieme noeud:");
-			String vois2 = recupere_string();
-			
-			while(!g.removeLien(vois1, vois2)) {
-				ecrire_console("Au moins un des deux noeuds ou le lien n'existe pas.");
-				
-				ecrire_console("Nom du premier noeud:");
-				vois1 = recupere_string();
-				ecrire_console("Nom du deuxieme noeud:");
-				vois2 = recupere_string();
-			}
-			ecrire_console("Le lien a bien ete supprime entre " + vois1 + " et " + vois2 + ".");
-		}
-		else {
-			ecrire_console("Aucun lien n'a encore ete cree.");
-		}
+	private static void handleRemoveRelation() {
+		
+	}
+	
+	/*
+	 *
+	 *
+	 *
+	 */
+	
+	private static void handleHasRelation() {
+		
 	}
 	
 	/*
@@ -200,25 +217,20 @@ public class MainConsole extends ActionConsole {
 	 * 
 	 */
 	
-	private static void handleChemin() {
-		if(g.nbNoeuds() > 1) {
-			ecrire_console("Nom du premier noeud:");
-			String noeud1 = recupere_string();
-			ecrire_console("Nom du deuxieme noeud:");
-			String noeud2 = recupere_string();
-			
-			if(g.cheminExiste(noeud1, noeud2)) {
-				ecrire_console("Il existe au moins un chemin entre les deux noeuds.");
-				ecrire_console("Un exemple de chemin:");
-				ecrire_console(g.chemin(noeud1, noeud2).toString());
-			}
-			else {
-				ecrire_console("Aucun chemin ne relie les deux noeuds.");
-			}
-		}
-		else {
-			ecrire_console("Il n'y a pas assez de noeuds crees.");
-		}
+	private static void handleHasAttribute() {
+		
+	}
+	
+	/*
+	 * 
+	 * 
+	 * 
+	 */
+	
+	private static void handleQuit() {
+		ecrire_console("Vous quittez le programme...");
+		
+		isInProgress = false;
 	}
 	
 	/*
@@ -228,7 +240,7 @@ public class MainConsole extends ActionConsole {
 	 * 
 	 */
 	
-	private static Graphe handleCommand() {
+	private static void handleCommand() {
 		ecrire_console("Choix de commande (1 - 4) :");
 		
 		int choix = recupere_int();
@@ -240,26 +252,34 @@ public class MainConsole extends ActionConsole {
 		
 		switch (choix) {
 		case 1:
-			handleNewNoeud();
+			handleNewNode();
 			break;
 		case 2:
-			handleRemoveNoeud();
+			handleRemoveNode();
 			break;
 		case 3:
-			handleNewLien();
+			handleConfigureNode();
 			break;
 		case 4:
-			handleRemoveLien();
+			handleNewRelation();
 			break;
 		case 5:
-			handleChemin();
+			handleRemoveRelation();
+			break;
+		case 6:
+			handleHasRelation();
+			break;
+		case 7:
+			handleHasAttribute();
+			break;
+		case 8:
+			handleQuit();
 			break;
 		default:
 			ecrire_console("Erreur.");
 			break;
 		}
 		
-		return g;
 	}
 	
 	/**********************************************************
@@ -273,26 +293,22 @@ public class MainConsole extends ActionConsole {
 
 	public static void main(String[] args) {
 		
-		/* initialisation des variables */
-		boolean continuer = true;
+		/* configuration du programme */
+		progConfig();
 		
-		/* configuration */
-		configGraphe();
-		
-		/* affichage de l'état du graphe */
-		displayStateGraphe();
+		/* configuration du graphe */
+		graphConfig();
 		
 		/* coeur du programme */
-		while (continuer) {
+		while (isInProgress) {
+			/* affiche l'état du graphe */
+			displayGraphState();
 			
 			/* affiche le menu */
 			displayMenu();
 			
 			/* récupère et traite le choix de l'utilisateur */
 			handleCommand();
-			
-			/* affiche l'état du graphe */
-			displayStateGraphe();
 			
 		}
 		
