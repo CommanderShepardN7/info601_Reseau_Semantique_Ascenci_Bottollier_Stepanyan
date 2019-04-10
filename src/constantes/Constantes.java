@@ -1,7 +1,5 @@
 package constantes;
 
-import java.util.Date;
-
 public class Constantes {
 	
 	/**********************************************************
@@ -16,6 +14,10 @@ public class Constantes {
 	public static final int CHOIX_SET_SOCKET = 2;
 	public static final int CHOIX_SET_RAM = 3;
 	public static final int CHOIX_SET_PRICE = 4;
+	
+	public static final int CHOIX_SET_IS_A = 1;
+	public static final int CHOIX_SET_IS_MODEL_OF = 2;
+	public static final int CHOIX_SET_IS_QUAD_CORE_OF = 3;
 	
 	/**********************************************************
 	 * 

@@ -414,7 +414,7 @@ public class KnowledgeNode extends OrientedNode<KnowledgeNode> {
 			}
 			if(nbIsQuadCore > 0) {
 				s += "    Is Quad Core Of => (";
-				for(int j=0; j < nbIsA; j++) {
+				for(int j=0; j < nbIsQuadCore; j++) {
 					s += "(" + getIsQuadCoreOfRelation().get(j).getName() + ")";
 				}
 				s += ")\n";

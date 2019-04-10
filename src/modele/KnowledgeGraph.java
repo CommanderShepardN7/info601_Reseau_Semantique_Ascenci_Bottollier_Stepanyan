@@ -297,6 +297,16 @@ public class KnowledgeGraph extends OrientedGraph<KnowledgeNode> {
 	 * 
 	 */
 	
+	public boolean removeRelation (String nodeName, String nodeRelatedName, TRelation relation) {
+		return getANode(nodeName).removeRelation(getANode(nodeRelatedName), relation);
+	}
+	
+	/*
+	 * 
+	 * 
+	 * 
+	 */
+	
 	public void setAttribute (String nodeName, TAttribute attr, String value) {
 		getANode(nodeName).setAttribute(attr, value);
 	}

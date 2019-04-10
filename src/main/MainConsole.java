@@ -138,8 +138,8 @@ public class MainConsole extends ActionConsole {
 		ecrire_console("3 - Configurer un noeud existant");
 		ecrire_console("4 - Creer un lien entre deux noeuds");
 		ecrire_console("5 - Supprimer un lien existant entre deux noeuds");
-		ecrire_console("6 - Verifier si un noeud a une relation donnee, sinon recherche si elle est accessible a partir de ce noeud");
-		ecrire_console("7 - Verifier si un noeud a un attribut donne, sinon recherche parmi ses \"parents\" l'attribut donne");
+		ecrire_console("6 - Verifier si un type de relation existe parmi les noeuds connectes a un noeud precis");
+		ecrire_console("7 - Verifier si un type d'attribut existe parmi les noeuds connectes a un noeuds precis via des relations \"is a\"");
 		ecrire_console("8 - Quitter le programme");
 		ecrire_console(Constantes.CONSOLE_SEPARATOR);
 	}
@@ -216,7 +216,7 @@ public class MainConsole extends ActionConsole {
 					j++;
 				}
 				
-				ecrire_console("Choix de commande (1 - " + (j+1) + ") :");
+				ecrire_console("Choix de commande (1 - " + j + ") :");
 				
 				int choix = recupere_int();
 				
@@ -261,7 +261,60 @@ public class MainConsole extends ActionConsole {
 	 */
 	
 	private static void handleNewRelation() {
-		
+		if(g.nbNodes() > 0) {
+					
+			ecrire_console("Nom du premier noeud:");
+			
+			String nodeName = recupere_string();
+			
+			ecrire_console("Nom du successeur:");
+			
+			String succName = recupere_string();
+			
+			/* si les noeuds existent */
+			if(g.nodeExists(nodeName) != -1 && g.nodeExists(succName) != -1) {
+				TRelation rel;
+				
+				ecrire_console("Quel type de relation souhaitez-vous entre ces noeuds?");
+				
+				/* affichage des attributs */
+				int j = 0;
+				while (j<TRelation.values().length) {
+					/* on récupère une relation */
+					rel = TRelation.values()[j];
+					ecrire_console((j+1) + "- " + rel.getNom());
+					
+					/* on passe à la relation suivante */
+					j++;
+				}
+				
+				ecrire_console("Choix de commande (1 - " + j + ") :");
+				
+				int choix = recupere_int();
+				
+				while(!(choix >= 1 && choix <= j)) {
+					ecrire_console("La commande saisie doit etre comprise entre 1 et " + j + ".");
+					choix = recupere_int();
+				}
+				
+				switch(choix) {
+				case Constantes.CHOIX_SET_IS_A:
+					g.addRelation(nodeName, succName, TRelation.IS_A);
+					break;
+				case Constantes.CHOIX_SET_IS_MODEL_OF:
+					g.addRelation(nodeName, succName, TRelation.IS_MODEL_OF);
+					break;
+				case Constantes.CHOIX_SET_IS_QUAD_CORE_OF:
+					g.addRelation(nodeName, succName, TRelation.IS_QUAD_CORE_OF);
+					break;
+				default:
+				}
+				
+			}
+			else {
+				ecrire_console("Au moins un des deux noeuds n'existe pas.");
+			}
+		}
 	}
 	
 	/*
@@ -273,7 +326,60 @@ public class MainConsole extends ActionConsole {
 	 */
 	
 	private static void handleRemoveRelation() {
-		
+		if(g.nbNodes() > 0) {
+			
+			ecrire_console("Nom du premier noeud:");
+			
+			String nodeName = recupere_string();
+			
+			ecrire_console("Nom du successeur:");
+			
+			String succName = recupere_string();
+			
+			/* si les noeuds existent */
+			if(g.nodeExists(nodeName) != -1 && g.nodeExists(succName) != -1) {
+				TRelation rel;
+				
+				ecrire_console("Quel type de relation souhaitez-vous supprimer entre ces noeuds?");
+				
+				/* affichage des attributs */
+				int j = 0;
+				while (j<TRelation.values().length) {
+					/* on récupère une relation */
+					rel = TRelation.values()[j];
+					ecrire_console((j+1) + "- " + rel.getNom());
+					
+					/* on passe à la relation suivante */
+					j++;
+				}
+				
+				ecrire_console("Choix de commande (1 - " + j + ") :");
+				
+				int choix = recupere_int();
+				
+				while(!(choix >= 1 && choix <= j)) {
+					ecrire_console("La commande saisie doit etre comprise entre 1 et " + j + ".");
+					choix = recupere_int();
+				}
+				
+				switch(choix) {
+				case Constantes.CHOIX_SET_IS_A:
+					g.removeRelation(nodeName, succName, TRelation.IS_A);
+					break;
+				case Constantes.CHOIX_SET_IS_MODEL_OF:
+					g.removeRelation(nodeName, succName, TRelation.IS_MODEL_OF);
+					break;
+				case Constantes.CHOIX_SET_IS_QUAD_CORE_OF:
+					g.removeRelation(nodeName, succName, TRelation.IS_QUAD_CORE_OF);
+					break;
+				default:
+				}
+				
+			}
+			else {
+				ecrire_console("Au moins un des deux noeuds n'existe pas.");
+			}
+		}
 	}
 	
 	/*
@@ -283,7 +389,67 @@ public class MainConsole extends ActionConsole {
 	 */
 	
 	private static void handleHasRelation() {
-		
+		if(g.nbNodes() > 0) {
+			
+			ecrire_console("Nom du noeud de depart:");
+			
+			String nodeName = recupere_string();
+			
+			/* si les noeuds existent */
+			if(g.nodeExists(nodeName) != -1) {
+				TRelation rel;
+				
+				ecrire_console("Quel type de relation souhaitez-vous retrouver?");
+				
+				/* affichage des attributs */
+				int j = 0;
+				while (j<TRelation.values().length) {
+					/* on récupère une relation */
+					rel = TRelation.values()[j];
+					ecrire_console((j+1) + "- " + rel.getNom());
+					
+					/* on passe à la relation suivante */
+					j++;
+				}
+				
+				ecrire_console("Choix de commande (1 - " + j + ") :");
+				
+				int choix = recupere_int();
+				
+				while(!(choix >= 1 && choix <= j)) {
+					ecrire_console("La commande saisie doit etre comprise entre 1 et " + j + ".");
+					choix = recupere_int();
+				}
+				
+				KnowledgeNode nodeRes;
+				TRelation wanted = null;
+				
+				switch(choix) {
+				case Constantes.CHOIX_SET_IS_A:
+					wanted = TRelation.IS_A;
+					break;
+				case Constantes.CHOIX_SET_IS_MODEL_OF:
+					wanted = TRelation.IS_MODEL_OF;
+					break;
+				case Constantes.CHOIX_SET_IS_QUAD_CORE_OF:
+					wanted = TRelation.IS_QUAD_CORE_OF;
+					break;
+				default:
+				}
+				
+				nodeRes = g.firstNodeWithRelation(nodeName, wanted);
+				if(nodeRes != null) {
+					ecrire_console("(" + nodeRes.getName() + " -> " + wanted + " -> " + nodeRes.getRelation(wanted).get(0).getName() + ")");
+				}
+				else {
+					ecrire_console("Aucun noeud connecte a " + nodeName + " ne possède encore cette relation.");
+				}
+				
+			}
+			else {
+				ecrire_console("Au moins un des deux noeuds n'existe pas.");
+			}
+		}
 	}
 	
 	/*
@@ -293,7 +459,70 @@ public class MainConsole extends ActionConsole {
 	 */
 	
 	private static void handleHasAttribute() {
-		
+		if(g.nbNodes() > 0) {
+			
+			ecrire_console("Nom du noeud de depart:");
+			
+			String nodeName = recupere_string();
+			
+			/* si les noeuds existent */
+			if(g.nodeExists(nodeName) != -1) {
+				TAttribute attr;
+				
+				ecrire_console("Quel type d'attribut souhaitez-vous retrouver?");
+				
+				/* affichage des attributs */
+				int j = 0;
+				while (j<TAttribute.values().length) {
+					/* on récupère une relation */
+					attr = TAttribute.values()[j];
+					ecrire_console((j+1) + "- " + attr.getNom());
+					
+					/* on passe à la relation suivante */
+					j++;
+				}
+				
+				ecrire_console("Choix de commande (1 - " + j + ") :");
+				
+				int choix = recupere_int();
+				
+				while(!(choix >= 1 && choix <= j)) {
+					ecrire_console("La commande saisie doit etre comprise entre 1 et " + j + ".");
+					choix = recupere_int();
+				}
+				
+				KnowledgeNode nodeRes;
+				TAttribute wanted = null;
+				
+				switch(choix) {
+				case Constantes.CHOIX_SET_RELEASE_DATE:
+					wanted = TAttribute.RELEASE_DATE;
+					break;
+				case Constantes.CHOIX_SET_SOCKET:
+					wanted = TAttribute.SOCKET;
+					break;
+				case Constantes.CHOIX_SET_RAM:
+					wanted = TAttribute.RAM;
+					break;
+				case Constantes.CHOIX_SET_PRICE:
+					wanted = TAttribute.PRICE;
+					break;
+				default:
+				}
+				
+				nodeRes = g.firstNodeWithAttribute(nodeName, wanted);
+				if(nodeRes != null) {
+					ecrire_console("(" + nodeRes.getName() + " -> " + wanted + " : " + nodeRes.getAttribute(wanted) + ")");
+				}
+				else {
+					ecrire_console("Aucun noeud connecte a " + nodeName + " ne possède encore cet attribut.");
+				}
+				
+			}
+			else {
+				ecrire_console("Au moins un des deux noeuds n'existe pas.");
+			}
+		}
 	}
 	
 	/*
