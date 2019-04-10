@@ -6,6 +6,8 @@ import constantes.Constantes;
 import lisibilite_code.ActionConsole;
 import modele.KnowledgeGraph;
 import modele.KnowledgeNode;
+import types.TAttribute;
+import types.TRelation;
 
 
 /**********************************************************
@@ -64,33 +66,50 @@ public class MainConsole extends ActionConsole {
 		
 		/* Tests */
 		
-		KnowledgeNode a = new KnowledgeNode("a");
-		KnowledgeNode b = new KnowledgeNode("b");
-		KnowledgeNode c = new KnowledgeNode("c");
-		KnowledgeNode d = new KnowledgeNode("d");
-		KnowledgeNode e = new KnowledgeNode("e");
-		
-		g.addNode(a);
-		g.addNode(b);
-		g.addNode(c);
-		g.addNode(d);
-		g.addNode(e);
+//		KnowledgeNode a = new KnowledgeNode("a");
+//		KnowledgeNode b = new KnowledgeNode("b");
+//		KnowledgeNode c = new KnowledgeNode("c");
+//		KnowledgeNode d = new KnowledgeNode("d");
+//		KnowledgeNode e = new KnowledgeNode("e");
+//		
+//		g.addNode(a);
+//		g.addNode(b);
+//		g.addNode(c);
+//		g.addNode(d);
+//		g.addNode(e);
 		
 //		g.getANode("a").addIsARelation(g.getANode("b"));
 //		g.getANode("b").addIsARelation(g.getANode("d"));
 //		g.getANode("d").addIsARelation(g.getANode("e"));
 		
-		g.addIsARelation("a", "b");
-		g.addIsARelation("b", "d");
-		g.addIsARelation("d", "e");
-		
-		ecrire_console(g.isALoopGenerated("a"));
+//		g.addRelation("a", "b", TRelation.IS_A);
+//		g.addRelation("b", "d", TRelation.IS_A);
+//		g.addRelation("d", "e", TRelation.IS_A);
+//		g.addRelation("b", "c", TRelation.IS_A);
+//		
+//		ecrire_console(g.isALoopGenerated("a"));
 		
 //		g.getANode("e").addIsARelation(g.getANode("e"));
 		
-		g.addIsARelation("e", "e");
+//		g.addRelation("e", "e", TRelation.IS_A);
+//		
+//		ecrire_console(g.isALoopGenerated("a"));
+//		
+//		g.addRelation("e", "d", TRelation.IS_MODEL_OF);
+//		g.addRelation("d", "a", TRelation.IS_QUAD_CORE_OF);
+//		
+//		ecrire_console(g.firstNodeWithRelation("a", TRelation.IS_MODEL_OF));
+//		
+//		ecrire_console(g.firstNodeWithRelation("a", TRelation.IS_QUAD_CORE_OF));
 		
-		ecrire_console(g.isALoopGenerated("a")); // on remarque que la vérification de boucle fonctionne!!!
+//		g.removeNode("d");
+		
+//		g.setAttribute("a", TAttribute.PRICE, "10");
+//		g.setAttribute("d", TAttribute.RAM, "DDR3");
+//		
+//		ecrire_console(g.firstNodeWithAttribute("a", TAttribute.PRICE));
+//		ecrire_console(g.firstNodeWithAttribute("a", TAttribute.RAM));
+//		ecrire_console(g.firstNodeWithAttribute("a", TAttribute.RELEASE_DATE));
 		
 		///////////////////////////////////////////
 
@@ -175,9 +194,59 @@ public class MainConsole extends ActionConsole {
 	
 	private static void handleConfigureNode() {
 		if(g.nbNodes() > 0) {
+			
 			ecrire_console("Nom du noeud a modifier:");
 			
+			String nodeName = recupere_string();
 			
+			/* si le noeud existe */
+			if(g.nodeExists(nodeName) != -1) {
+				TAttribute attr;
+				
+				ecrire_console("Quel attribut souhaitez-vous mettre a jour?");
+				
+				/* affichage des attributs */
+				int j = 0;
+				while (j<TAttribute.values().length) {
+					/* on récupère une relation */
+					attr = TAttribute.values()[j];
+					ecrire_console((j+1) + "- " + attr.getNom());
+					
+					/* on passe à la relation suivante */
+					j++;
+				}
+				
+				ecrire_console("Choix de commande (1 - " + (j+1) + ") :");
+				
+				int choix = recupere_int();
+				
+				while(!(choix >= 1 && choix <= j)) {
+					ecrire_console("La commande saisie doit etre comprise entre 1 et " + j + ".");
+					choix = recupere_int();
+				}
+				
+				ecrire_console("Entrez votre valeur:");
+				String value = recupere_string();
+				
+				switch(choix) {
+				case Constantes.CHOIX_SET_RELEASE_DATE:
+					g.setAttribute(nodeName, TAttribute.RELEASE_DATE, value);
+					break;
+				case Constantes.CHOIX_SET_SOCKET:
+					g.setAttribute(nodeName, TAttribute.SOCKET, value);
+					break;
+				case Constantes.CHOIX_SET_RAM:
+					g.setAttribute(nodeName, TAttribute.RAM, value);
+					break;
+				case Constantes.CHOIX_SET_PRICE:
+					g.setAttribute(nodeName, TAttribute.PRICE, value);
+					break;
+				default:
+				}
+			}
+			else {
+				ecrire_console("Aucun noeud n'a ce nom.");
+			}
 		}
 		else {
 			ecrire_console("Aucun noeud n'a encore ete cree.");

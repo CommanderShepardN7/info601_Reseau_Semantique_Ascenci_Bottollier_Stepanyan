@@ -1,9 +1,9 @@
 package modele;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import constantes.Constantes;
+import types.TAttribute;
 import types.TRelation;
 
 /**********************************************************
@@ -12,7 +12,7 @@ import types.TRelation;
  * 
  *********************************************************/
 
-public class KnowledgeNode extends OrientedNode {
+public class KnowledgeNode extends OrientedNode<KnowledgeNode> {
 	
 	/**********************************************************
 	 * 
@@ -24,10 +24,10 @@ public class KnowledgeNode extends OrientedNode {
 	protected ArrayList<KnowledgeNode> isModelOf;
 	protected ArrayList<KnowledgeNode> isQuadCoreOf;
 	
-	protected Date releaseDate;
+	protected String releaseDate;
 	protected String socket;
 	protected String ram;
-	protected int price;
+	protected String price;
 
 	/**********************************************************
 	 * 
@@ -39,7 +39,7 @@ public class KnowledgeNode extends OrientedNode {
 		this(nodeName, Constantes.NOT_SET_RELEASEDATE, Constantes.NOT_SET_SOCKET, Constantes.NOT_SET_RAM, Constantes.NOT_SET_PRICE);
 	}
 	
-	public KnowledgeNode(String nodeName, Date releaseDate, String socket, String ram, int price) {
+	public KnowledgeNode(String nodeName, String releaseDate, String socket, String ram, String price) {
 		setIsARelation(new ArrayList<KnowledgeNode>());
 		setIsModelOfRelation(new ArrayList<KnowledgeNode>());
 		setIsQuadCoreOfRelation(new ArrayList<KnowledgeNode>());
@@ -80,11 +80,25 @@ public class KnowledgeNode extends OrientedNode {
 		this.isQuadCoreOf = isQuadCoreOf;
 	}
 	
-	public Date getReleaseDate() {
+	@SuppressWarnings("unchecked")
+	public ArrayList<KnowledgeNode> getRelation(TRelation relation) {
+		switch(relation) {
+		case IS_A:
+			return getIsARelation();
+		case IS_MODEL_OF:
+			return getIsModelOfRelation();
+		case IS_QUAD_CORE_OF:
+			return getIsQuadCoreOfRelation();
+		default:
+			return (ArrayList<KnowledgeNode>) Constantes.NOT_SET_OBJECT;
+		}
+	}
+	
+	public String getReleaseDate() {
 		return releaseDate;
 	}
 
-	public void setReleaseDate(Date releaseDate) {
+	public void setReleaseDate(String releaseDate) {
 		this.releaseDate = releaseDate;
 	}
 
@@ -104,12 +118,45 @@ public class KnowledgeNode extends OrientedNode {
 		this.ram = ram;
 	}
 
-	public int getPrice() {
+	public String getPrice() {
 		return price;
 	}
 
-	public void setPrice(int price) {
+	public void setPrice(String price) {
 		this.price = price;
+	}
+	
+	public void setAttribute(TAttribute attr, String value) {
+		switch(attr) {
+		case RELEASE_DATE:
+			setReleaseDate(value);
+			break;
+		case SOCKET:
+			setSocket(value);
+			break;
+		case RAM:
+			setRam(value);
+			break;
+		case PRICE:
+			setPrice(value);
+			break;
+		default:
+		}
+	}
+	
+	public Object getAttribute(TAttribute attr) {
+		switch(attr) {
+		case RELEASE_DATE:
+			return getReleaseDate();
+		case SOCKET:
+			return getSocket();
+		case RAM:
+			return getRam();
+		case PRICE:
+			return getPrice();
+		default:
+			return Constantes.NOT_SET_OBJECT;
+		}
 	}
 	
 	/**********************************************************
@@ -164,6 +211,27 @@ public class KnowledgeNode extends OrientedNode {
 	 * 
 	 */
 	
+	public boolean hasAttribute(TAttribute attr) {
+		switch(attr) {
+		case RELEASE_DATE:
+			return hasReleaseDate();
+		case SOCKET:
+			return hasSocket();
+		case RAM:
+			return hasRam();
+		case PRICE:
+			return hasPrice();
+		default:
+			return false;
+		}
+	}
+	
+	/*
+	 * 
+	 * 
+	 * 
+	 */
+	
 	public boolean addIsARelation(KnowledgeNode node) {
 		return this.isA.add(node);
 	}
@@ -194,6 +262,25 @@ public class KnowledgeNode extends OrientedNode {
 	 * 
 	 */
 	
+	public boolean addRelation (KnowledgeNode node, TRelation relation) {
+		switch(relation) {
+		case IS_A:
+			return addIsARelation(node);
+		case IS_MODEL_OF:
+			return addIsModelOfRelation(node);
+		case IS_QUAD_CORE_OF:
+			return addIsQuadCoreOfRelation(node);
+		default:
+			return false;
+		}
+	}
+	
+	/*
+	 * 
+	 * 
+	 * 
+	 */
+	
 	public boolean removeIsARelation(KnowledgeNode node) {
 		return this.isA.remove(node);
 	}
@@ -216,6 +303,25 @@ public class KnowledgeNode extends OrientedNode {
 	
 	public boolean removeIsQuadCoreOfRelation(KnowledgeNode node) {
 		return this.isQuadCoreOf.remove(node);
+	}
+	
+	/*
+	 * 
+	 * 
+	 * 
+	 */
+	
+	public boolean removeRelation (KnowledgeNode node, TRelation relation) {
+		switch(relation) {
+		case IS_A:
+			return removeIsARelation(node);
+		case IS_MODEL_OF:
+			return removeIsModelOfRelation(node);
+		case IS_QUAD_CORE_OF:
+			return removeIsQuadCoreOfRelation(node);
+		default:
+			return false;
+		}
 	}
 	
 	/*
@@ -265,6 +371,59 @@ public class KnowledgeNode extends OrientedNode {
 		default:
 			return false;
 		}
+	}
+	
+	/*
+	 * 
+	 * 
+	 * 
+	 */
+	
+	public String toString () {
+		String s = "";
+		
+		// attributes
+		
+		s += "(Nom:         " + getName();
+		s += (hasSocket()? ",\n Socket:      " + getSocket() : "");
+		s += (hasRam()? ",\n Ram:         " + getRam() : "");
+		s += (hasPrice()? ",\n Price:       " + getPrice() + "€" : "");
+		s += (hasReleaseDate()? ",\n ReleaseDate: " + getReleaseDate() : "");
+		s += "):\n";
+		
+		int nbIsA = getIsARelation().size();
+		int nbIsModelOf = getIsModelOfRelation().size();
+		int nbIsQuadCore = getIsQuadCoreOfRelation().size();
+		
+		// relations
+		
+		if(nbIsA > 0 || nbIsModelOf > 0 || nbIsQuadCore > 0) {
+			if(nbIsA > 0) {
+				s += "    Is A => (";
+				for(int j=0; j < nbIsA; j++) {
+					s += "(" + getIsARelation().get(j).getName() + ")";
+				}
+				s += ")\n";
+			}
+			if(nbIsModelOf > 0) {
+				s += "    Is Model Of => (";
+				for(int j=0; j < nbIsModelOf; j++) {
+					s += "(" + getIsModelOfRelation().get(j).getName() + ")";
+				}
+				s += ")\n";
+			}
+			if(nbIsQuadCore > 0) {
+				s += "    Is Quad Core Of => (";
+				for(int j=0; j < nbIsA; j++) {
+					s += "(" + getIsQuadCoreOfRelation().get(j).getName() + ")";
+				}
+				s += ")\n";
+			}
+		} else {
+			s += "    Aucune relation n'a encore été créée.\n";
+		}
+		
+		return s;
 	}
 	
 }

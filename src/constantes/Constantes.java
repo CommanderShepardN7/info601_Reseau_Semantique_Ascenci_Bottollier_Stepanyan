@@ -6,11 +6,16 @@ public class Constantes {
 	
 	/**********************************************************
 	 * 
-	 * 
+	 * MainConsole
 	 * 
 	 *********************************************************/
 	
 	public static final String CONSOLE_SEPARATOR = "######################################";
+	
+	public static final int CHOIX_SET_RELEASE_DATE = 1;
+	public static final int CHOIX_SET_SOCKET = 2;
+	public static final int CHOIX_SET_RAM = 3;
+	public static final int CHOIX_SET_PRICE = 4;
 	
 	/**********************************************************
 	 * 
@@ -26,9 +31,9 @@ public class Constantes {
 	 * 
 	 *********************************************************/
 	
-	public static final Date NOT_SET_RELEASEDATE = null;
+	public static final String NOT_SET_RELEASEDATE = null;
 	public static final String NOT_SET_SOCKET = null;
 	public static final String NOT_SET_RAM = null;
-	public static final int NOT_SET_PRICE = -1;
+	public static final String NOT_SET_PRICE = null;
 	
 }
